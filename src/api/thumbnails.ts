@@ -29,6 +29,11 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   }
 
   const imageType = imageData.type;
+  const allowedTypes = ["image/jpeg", "image/png"];
+  if (!allowedTypes.includes(imageType)) {
+    throw new BadRequestError("image must be jpeg or png")
+  }
+  
   const imageBuffer = await imageData.arrayBuffer();
 
   const video = getVideo(cfg.db, videoId);
