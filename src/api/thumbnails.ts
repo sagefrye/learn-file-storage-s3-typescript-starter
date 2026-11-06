@@ -5,6 +5,9 @@ import type { ApiConfig } from "../config";
 import type { BunRequest } from "bun";
 import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors";
 import path from "path";
+const {
+  randomBytes,
+} = await import('node:crypto');
 
 export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   const { videoId } = req.params as { videoId?: string };
@@ -33,7 +36,7 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   if (!allowedTypes.includes(imageType)) {
     throw new BadRequestError("image must be jpeg or png")
   }
-  
+
   const imageBuffer = await imageData.arrayBuffer();
 
   const video = getVideo(cfg.db, videoId);
@@ -50,7 +53,7 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
   console.log(fileRoot);
   const fileName = path.format({
     root: "/",
-    name: videoId,
+    name: randomBytes(32).toString("base64url"),
     ext: fileExt
   });
   const filePath = path.join(fileRoot, fileName);
